@@ -1,0 +1,12 @@
+: 1
+name: zstd
+version: 1.5.1-a.0.z
+summary: Zstandard - Fast real-time compression algorithm
+license: BSD-3-Clause
+description-file: upstream/README.md
+url: https://facebook.github.io/zstd/
+src-url: https://github.com/facebook/zstd
+doc-url: https://github.com/facebook/zstd/wiki
+
+depends: * build2 >= 0.14.0
+depends: * bpkg >= 0.14.0
