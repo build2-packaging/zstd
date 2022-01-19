@@ -1,0 +1,12 @@
+import libs = zstd%lib{zstd}
+
+c.poptions += "-I$src_base/lib/common" "-I$src_base/programs"
+
+if ($c.target.class != 'windows')
+    c.loptions += "-lpthread"
+
+./: exe{fuzzer}: c{fuzzer} programs/{h c}{timefn util datagen} $libs
+exe{fuzzer}: test.options = '--no-big-tests' '--no-long-tests' '-i2048'
+
+./: exe{frametest}: c{fullbench} programs/{h c}{benchfn benchzstd timefn util datagen} $libs
+exe{frametest}: test.options = '-i2' '-B10240'
