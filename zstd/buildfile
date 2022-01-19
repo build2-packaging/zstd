@@ -1,0 +1,45 @@
+c.poptions += "-DZSTD_MULTITHREAD"
+
+if ($c.target.class != 'windows')
+    c.loptions += "-lpthread"
+
+./: lib{zstd}: \
+    lib/common/{h c}{*} \
+    lib/compress/{h c}{*} \
+    lib/decompress/{h c}{*} \
+    lib/dictBuilder/{h c}{*} \
+    lib/h{zdict zstd zstd_errors}
+{
+    cc.export.poptions += "-DZSTD_MULTITHREAD" "-I$src_base/lib"
+}
+
+enable_assembly = (($c.target.class == 'macos') || ($c.target.class == 'linux'))
+if ($enable_assembly)
+{
+    lib{zstd}: c.coptions += "-mbmi"
+}
+
+sources_assembly = lib/decompress/huf_decompress_amd64.S
+
+for f: $sources_assembly
+{
+    obja{$name($f)...a.o} objs{$name($f)...so.o}: $f
+    {{
+        diag as $>
+        $c.path -o $path($>) -c $path($<[0])
+    }}
+    lib{zstd}: obj{$name($f)}: include = $enable_assembly
+}
+
+if ($c.target.class == 'windows')
+{
+    lib/{hbmis objs}{*}: c.poptions += "-DZSTD_DLL_EXPORT=1"
+    libs{zstd}: cc.export.poptions += "-DZSTD_DLL_IMPORT=1"
+}
+
+c.poptions += "-DBUILD2_ZSTD_VERSION=\"$version\"" "-I$src_base/programs"
+./: exe{zstd}: programs/{h c}{* -zstdcli} c{zstdcli} lib{zstd}
+
+h{**}: install = false
+
+lib/h{*}: install = include/
