@@ -28,7 +28,7 @@ for f: $sources_assembly
         diag as $>
         $c.path -o $path($>) -c $path($<[0])
     }}
-    lib{zstd}: lib/decompress/obj{$name($f)}: include = $enable_assembly
+    lib{zstd}: lib/decompress/file{$f} lib/decompress/obj{$name($f)}: include = $enable_assembly
 }
 
 if ($c.target.class == 'windows')
@@ -38,7 +38,7 @@ if ($c.target.class == 'windows')
 }
 
 c.poptions += "-DBUILD2_ZSTD_VERSION=\"$version\"" "-I$src_base/programs"
-./: exe{zstd}: programs/{h c}{* -zstdcli} c{zstdcli} lib{zstd}
+./: exe{zstd}: programs/{h c}{* -zstdcli} programs/file{zstdcli.c} c{zstdcli} lib{zstd}
 
 h{**}: install = false
 
