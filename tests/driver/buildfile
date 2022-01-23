@@ -1,6 +1,6 @@
 import libs = zstd%lib{zstd}
 
-c.poptions += "-I$src_base/lib/common" "-I$src_base/programs"
+c.poptions += "-DZSTD_MULTITHREAD" "-I$src_base/lib/common" "-I$src_base/programs"
 
 if ($c.target.class != 'windows')
     c.loptions += "-lpthread"
