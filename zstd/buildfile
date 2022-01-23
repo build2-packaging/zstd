@@ -19,16 +19,16 @@ if ($enable_assembly)
     lib{zstd}: c.coptions += "-mbmi"
 }
 
-sources_assembly = lib/decompress/huf_decompress_amd64.S
+sources_assembly = huf_decompress_amd64.S
 
 for f: $sources_assembly
 {
-    obja{$name($f)...a.o} objs{$name($f)...so.o}: $f
+    lib/decompress/obja{$name($f)...a.o} lib/decompress/objs{$name($f)...so.o}: lib/decompress/$f
     {{
         diag as $>
         $c.path -o $path($>) -c $path($<[0])
     }}
-    lib{zstd}: obj{$name($f)}: include = $enable_assembly
+    lib{zstd}: lib/decompress/obj{$name($f)}: include = $enable_assembly
 }
 
 if ($c.target.class == 'windows')
