@@ -1,7 +1,7 @@
 c.poptions += "-DZSTD_MULTITHREAD"
 
 if ($c.target.class != 'windows')
-    c.loptions += "-lpthread"
+    c.libs += "-lpthread"
 
 ./: lib{zstd}: \
     lib/common/{h c}{*} \
