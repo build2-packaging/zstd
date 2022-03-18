@@ -33,9 +33,13 @@ for f: $sources_assembly
 
 if ($c.target.class == 'windows')
 {
+    c.poptions += "-DWIN32"
     lib/{hbmis objs}{*}: c.poptions += "-DZSTD_DLL_EXPORT=1"
-    libs{zstd}: cc.export.poptions += "-DZSTD_DLL_IMPORT=1"
+    libs{zstd}: cc.export.poptions += "-DZSTD_DLL_IMPORT=1" "-DWIN32"
 }
+
+{hbmis objs}{*}: c.poptions += "-DXXH_EXPORT=1"
+libs{zstd}: cc.export.poptions += "-DXXH_IMPORT=1"
 
 c.poptions += "-DBUILD2_ZSTD_VERSION=\"$version\"" "-I$src_base/programs"
 ./: exe{zstd}: programs/{h c}{* -zstdcli} programs/file{zstdcli.c} c{zstdcli} lib{zstd}
