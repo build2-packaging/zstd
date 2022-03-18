@@ -1,6 +1,6 @@
 : 1
 name: zstd
-version: 1.5.1-a.0.z
+version: 1.5.1
 summary: Zstandard - Fast real-time compression algorithm
 license: BSD-3-Clause
 description-file: upstream/README.md
