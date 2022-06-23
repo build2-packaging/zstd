@@ -1,0 +1,6 @@
+$out_root/
+{
+  include zstd/
+}
+
+export $out_root/zstd/$import.target

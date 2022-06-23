@@ -1,3 +1,2 @@
-./: {*/ -build/ -upstream/} doc{upstream/README.md} manifest
-
-tests/: install = false
+import pkgs = {libzstd/ zstd/}
+./: $pkgs
