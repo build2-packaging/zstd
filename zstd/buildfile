@@ -1,3 +1,2 @@
-./: {*/ -build/} doc{README.md} manifest
+./: {*/ -build/} doc{README.md} legal{LICENSE COPYING} manifest
 
-tests/: install = false

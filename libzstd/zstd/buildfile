@@ -1,7 +1,7 @@
 c.poptions += "-DZSTD_MULTITHREAD" "-I$src_base/lib"
 
 if ($c.target.class != 'windows')
-    c.libs += "-lpthread"
+    c.libs += -pthread
 
 lib{zstd}: \
     lib/common/{h c}{*} \
@@ -10,34 +10,51 @@ lib{zstd}: \
     lib/dictBuilder/{h c}{*} \
     lib/h{zdict zstd zstd_errors}
 {
+    # @@ None of the interface headers reference this macro. Are we
+    #    exporting it only so that users can detect multi-threaded build?
+    #    FWIW, upstream's pkg-config file (as found on Debian) does not
+    #    define this macro (but the library is built multi-threaded).
+    #
     cc.export.poptions += "-DZSTD_MULTITHREAD" "-I$src_base/lib"
 }
 
 enable_assembly = (($c.target.class == 'macos') || ($c.target.class == 'linux'))
 if ($enable_assembly)
 {
-    lib{zstd}: c.coptions += "-mbmi"
+    # @@ Setting coptions on lib{} target has no effect.
+    #lib{zstd}: c.coptions += "-mbmi"
+    c.coptions += -mbmi
 }
 
+# @@ Hm, shouldn't we check that c.target.cpu is x86_64?
+#
 sources_assembly = huf_decompress_amd64.S
 
 for f: $sources_assembly
 {
-    lib/decompress/obja{$name($f)...a.o} lib/decompress/objs{$name($f)...so.o}: lib/decompress/$f
+    lib/decompress/obj{$name($f)}: file{lib/decompress/$f}
+    lib/decompress/obja{$name($f)...a.o} lib/decompress/objs{$name($f)...so.o}:
     {{
         diag as $>
         $c.path -o $path($>) -c $path($<[0])
     }}
-    lib{zstd}: lib/decompress/file{$f} lib/decompress/obj{$name($f)}: include = $enable_assembly
+    lib{zstd}: lib/decompress/obj{$name($f)}: include = $enable_assembly
 }
 
 if ($c.target.class == 'windows')
 {
+    # @@ WIN32 is not referenced by any interface headers, why export it?
+    #
     c.poptions += "-DWIN32"
-    lib/{hbmis objs}{*}: c.poptions += "-DZSTD_DLL_EXPORT=1"
-    libs{zstd}: cc.export.poptions += "-DZSTD_DLL_IMPORT=1" "-DWIN32"
+    {hbmis objs}{*}: c.poptions += "-DZSTD_DLL_EXPORT=1"
+    libs{zstd}: cc.export.poptions += "-DZSTD_DLL_IMPORT=1" #"-DWIN32"
 }
 
+# @@ Hm I wonder if it's a good idea for libzstd to export xxhash API (which
+#    could be similarly exported by other libraries). It's not actually
+#    exposed by any interface headers. Perhaps we should rather do
+#    XXH_INLINE_ALL or XXH_PRIVATE_API?
+#
 {hbmis objs}{*}: c.poptions += "-DXXH_EXPORT=1"
 libs{zstd}: cc.export.poptions += "-DXXH_IMPORT=1"
 

@@ -1,7 +1,8 @@
 import libs = libzstd%lib{zstd}
 
 if ($c.target.class != 'windows')
-    c.libs += "-lpthread"
+    c.libs += -pthread
 
 c.poptions += "-DBUILD2_ZSTD_VERSION=\"$version\"" "-I$src_base/programs"
-exe{zstd}: programs/{h c}{* -zstdcli} programs/file{zstdcli.c} c{zstdcli} $libs
+exe{zstd}: programs/{h c}{* -zstdcli} c{zstdcli} $libs
+exe{zstd}: programs/c{zstdcli}: include = adhoc # included by zstdcli.c
