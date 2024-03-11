@@ -1,0 +1,6 @@
+$out_root/
+{
+  include libzstd/
+}
+
+export $out_root/libzstd/$import.target

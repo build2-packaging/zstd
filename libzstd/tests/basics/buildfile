@@ -1,0 +1,3 @@
+import libs = libzstd%lib{zstd}
+
+exe{driver}: {h c}{**} $libs testscript{**}
