@@ -17,3 +17,8 @@
 # Use `binary` to make sure certain files are never auto-detected as text.
 #
 #*.png binary
+
+libzstd/libzstd/common symlink=dir
+libzstd/libzstd/compress symlink=dir
+libzstd/libzstd/decompress symlink=dir
+libzstd/libzstd/dictBuilder symlink=dir
