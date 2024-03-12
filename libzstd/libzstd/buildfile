@@ -1,29 +1,53 @@
-intf_libs = # Interface dependencies.
-impl_libs = # Implementation dependencies.
-#import xxxx_libs += libhello%lib{hello}
+# We can turn these into configuration variables one day.
+#
+multithread = true
+assembler = ($c.class == 'gcc' && $c.target.cpu == 'x86_64')
 
-lib{zstd}: {h c}{**} $impl_libs $intf_libs
+# @@ TODO: link .rc file
+
+lib{zstd}: {h c}{**}
+lib{zstd}: decompress/S{*_amd64}: include = $assembler
 
 # Build options.
 #
-out_pfx = [dir_path] $out_root/libzstd/
 src_pfx = [dir_path] $src_root/libzstd/
 
-c.poptions =+ "-I$out_pfx" "-I$src_pfx"
+c.poptions =+ "-I$src_pfx"
 
-#obja{*}: c.poptions += -DLIBZSTD_STATIC_BUILD
-#objs{*}: c.poptions += -DLIBZSTD_SHARED_BUILD
+c.poptions += -DXXH_INLINE_ALL
+
+if $multithread
+  c.poptions += -DZSTD_MULTITHREAD
+
+switch $c.target.class, $c.target.system
+{
+  case 'windows', 'mingw32'
+    c.poptions += -D__USE_MINGW_ANSI_STDIO
+  case 'windows'
+    c.poptions += -DZSTD_HEAPMODE=0 -D_CRT_SECURE_NO_WARNINGS
+}
+
+if ($c.target.class == 'windows')
+  objs{*}: c.poptions += -DZSTD_DLL_EXPORT=1
+
+if ($multithread && $c.target.class != 'windows')
+  c.libs += -pthread
 
 # Export options.
 #
+lib{zstd}: c.export.poptions = "-I$src_pfx"
+
+if ($c.target.class == 'windows')
+  libs{zstd}: c.export.poptions += -DZSTD_DLL_IMPORT=1
+
+# Export metadata.
+#
 lib{zstd}:
 {
-  c.export.poptions = "-I$out_pfx" "-I$src_pfx"
-  c.export.libs = $intf_libs
-}
+  export.metadata = 1 libzstd
 
-#liba{zstd}: c.export.poptions += -DLIBZSTD_STATIC
-#libs{zstd}: c.export.poptions += -DLIBZSTD_SHARED
+  libzstd.multithread = [bool] $multithread
+}
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
@@ -34,10 +58,10 @@ if $version.pre_release
 else
   lib{zstd}: bin.lib.version = "-$version.major.$version.minor"
 
-# Install recreating subdirectories.
+# Only install public headers and directly into, say, /usr/include/.
 #
-h{*}:
-{
-  install         = include/
-  install.subdirs = true
-}
+# Note that while zdict.h is not decorated with zstd, we follow Debian and
+# assume this header name is "owned" by zstd.
+#
+h{zstd}@./ h{zstd_errors}@./ h{zdict}@./: install = include/
+h{*}: install = false

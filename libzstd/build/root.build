@@ -1,4 +1,5 @@
 using c
+using c.as-cpp
 
 h{*}: extension = h
 c{*}: extension = c
