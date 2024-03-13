@@ -18,6 +18,7 @@
 #
 #*.png binary
 
+libzstd/doc symlink=dir
 libzstd/libzstd/common symlink=dir
 libzstd/libzstd/compress symlink=dir
 libzstd/libzstd/decompress symlink=dir
