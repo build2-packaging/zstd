@@ -1,4 +1,5 @@
-# We can turn these into configuration variables one day.
+# We can turn these into configuration variables one day (remember to
+# update PACKAGE-README.md in this).
 #
 multithread = true
 assembler = ($c.class == 'gcc' && $c.target.cpu == 'x86_64')
