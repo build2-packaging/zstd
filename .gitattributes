@@ -23,3 +23,4 @@ libzstd/libzstd/common symlink=dir
 libzstd/libzstd/compress symlink=dir
 libzstd/libzstd/decompress symlink=dir
 libzstd/libzstd/dictBuilder symlink=dir
+zstd/zstd/programs symlink=dir
