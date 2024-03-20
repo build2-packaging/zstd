@@ -1,9 +1,20 @@
-: basics
+: roundtrip
 :
-$* 'World' >'Hello, World!'
+echo 'test content' | $* -zc | $* -dc >'test content'
 
-: missing-name
+: version
 :
-$* 2>>EOE != 0
-error: missing name
-EOE
+$* --version >>~"/EOO/"
+/.*$(version.major)\.$(version.minor)\.$(version.patch).*/
+EOO
+
+: metadata
+:
+$* --build2-metadata=1 >>"EOO"
+# build2 buildfile zstd
+export.metadata = 1 zstd
+zstd.name = [string] zstd
+zstd.version = [string] $version
+zstd.checksum = [string] $version
+zstd.environment = [strings] ZSTD_CLEVEL
+EOO
