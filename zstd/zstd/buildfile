@@ -1,9 +1,46 @@
-libs =
-#import libs += libhello%lib{hello}
+import! [metadata, rule_hint=c.link] lib = libzstd%lib{zstd}
 
-exe{zstd}: {h c}{**} $libs testscript
+multithread = $($lib: libzstd.multithread)
 
-out_pfx = [dir_path] $out_root/zstd/
-src_pfx = [dir_path] $src_root/zstd/
+# @@ TODO: test metadata
+# @@ TODO: man page
+# @@ TODO: link .rc file
 
-c.poptions =+ "-I$out_pfx" "-I$src_pfx"
+# The zstd executable source code liberally reaches into ../lib/ to include
+# both public and private headers. We work around this by providing thunks for
+# public headers and own symlinks for a small subset of private headers (under
+# the assumption that their use won't require any unexported by libzstd
+# symbols).
+#
+# Exclude benchmarking (plus datagen) and tracing support since they depend on
+# additional stuff from "../lib/" which likely requires unexported symbols.
+#
+exe{zstd}: c{zstdcli-build2} \
+           programs/{h c}{* -zstdcli -bench* -datagen -zstdcli_trace} \
+           lib/h{**} $lib testscript
+
+exe{zstd}: programs/c{zstdcli}: include = adhoc # Included in zstdcli-build2.c.
+
+c.poptions += -DZSTD_NOBENCH -DZSTD_NOTRACE
+
+if $multithread
+  c.poptions += -DZSTD_MULTITHREAD
+
+obj{zstdcli-build2}: c.poptions += "-DZSTD_VERSION_BUILD2=\"$version\""
+
+if ($multithread && $c.target.class != 'windows')
+  c.libs += -pthread
+
+# Target metadata, see also --build2-metadata in zstdcli-build2.c.
+#
+# Note that the ZSTD_NBTHREADS environment variable does not affect the
+# output.
+#
+exe{zstd}:
+{
+  export.metadata = 1 zstd
+  zstd.name = [string] zstd
+  zstd.version = [string] $version
+  zstd.checksum = [string] $version
+  zstd.environment = [strings] ZSTD_CLEVEL
+}
