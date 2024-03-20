@@ -2,7 +2,6 @@ import! [metadata, rule_hint=c.link] lib = libzstd%lib{zstd}
 
 multithread = $($lib: libzstd.multithread)
 
-# @@ TODO: man page
 # @@ TODO: link .rc file
 
 # The zstd executable source code liberally reaches into ../lib/ to include

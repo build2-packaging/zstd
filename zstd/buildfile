@@ -1,1 +1,3 @@
-./: {*/ -build/} doc{README.md PACKAGE-README.md CHANGELOG} legal{COPYING} manifest
+./: {*/ -build/} \
+    man1{zstd} doc{README.md PACKAGE-README.md CHANGELOG} \
+    legal{LICENSE COPYING} manifest
