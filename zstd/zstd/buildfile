@@ -2,7 +2,6 @@ import! [metadata, rule_hint=c.link] lib = libzstd%lib{zstd}
 
 multithread = $($lib: libzstd.multithread)
 
-# @@ TODO: test metadata
 # @@ TODO: man page
 # @@ TODO: link .rc file
 
@@ -10,14 +9,15 @@ multithread = $($lib: libzstd.multithread)
 # both public and private headers. We work around this by providing thunks for
 # public headers and own symlinks for a small subset of private headers (under
 # the assumption that their use won't require any unexported by libzstd
-# symbols).
+# symbols). Actually, that assumption proved wrong for fileio_asyncio.c so
+# we now also symlink a couple of source files from lib/.
 #
 # Exclude benchmarking (plus datagen) and tracing support since they depend on
 # additional stuff from "../lib/" which likely requires unexported symbols.
 #
 exe{zstd}: c{zstdcli-build2} \
            programs/{h c}{* -zstdcli -bench* -datagen -zstdcli_trace} \
-           lib/h{**} $lib testscript
+           lib/{h c}{**} $lib testscript
 
 exe{zstd}: programs/c{zstdcli}: include = adhoc # Included in zstdcli-build2.c.
 
