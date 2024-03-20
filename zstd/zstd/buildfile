@@ -28,9 +28,16 @@ if $multithread
 
 obj{zstdcli-build2}: c.poptions += "-DZSTD_VERSION_BUILD2=\"$version\""
 
-# Hide exported ZSTD_*threadPool() functions defined in pool.c.
+# Hide exported ZSTD_*threadPool() functions defined in pool.c. Also suppress
+# the unused function warning that will result from doing this.
 #
-lib/common/obj{pool}: c.poptions += -DZSTDLIB_STATIC_API=static
+lib/common/
+{
+  obj{pool}: c.poptions += -DZSTDLIB_STATIC_API=static
+
+  if ($c.class == 'gcc')
+    obj{pool}: c.coptions += -Wno-unused-function
+}
 
 if ($multithread && $c.target.class != 'windows')
   c.libs += -pthread
