@@ -1,7 +1,10 @@
-# zstd - An executable
+# zstd - Zstandard command line utility
 
-This is a `build2` package for the [`<UPSTREAM-NAME>`](https://<UPSTREAM-URL>)
-executable. It is a <SUMMARY-OF-FUNCTIONALITY>.
+This is a `build2` package for the
+[`zstd`](https://https://github.com/facebook/zstd) executable. It provides a
+command line interface for Zstandard, a fast lossless compression algorithm,
+targeting real-time compression scenarios at `zlib`-level and better
+compression ratios.
 
 Note that the `zstd` executable in this package provides `build2` metadata.
 
@@ -13,33 +16,11 @@ To start using `zstd` in your project, add the following build-time
 appropriate:
 
 ```
-depends: * zstd ^<VERSION>
+depends: * zstd ^1.5.5
 ```
 
 Then import the executable in your `buildfile`:
 
 ```
-import! [metadata] <TARGET> = zstd%exe{<TARGET>}
+import! [metadata] zstd = zstd%exe{zstd}
 ```
-
-
-## Importable targets
-
-This package provides the following importable targets:
-
-```
-exe{<TARGET>}
-```
-
-<DESCRIPTION-OF-IMPORTABLE-TARGETS>
-
-
-## Configuration variables
-
-This package provides the following configuration variables:
-
-```
-[bool] config.zstd.<VARIABLE> ?= false
-```
-
-<DESCRIPTION-OF-CONFIG-VARIABLES>
