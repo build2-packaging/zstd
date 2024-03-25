@@ -1,0 +1,68 @@
+# We can turn these into configuration variables one day (remember to
+# update PACKAGE-README.md in this).
+#
+multithread = true
+assembler = ($c.class == 'gcc' && $c.target.cpu == 'x86_64')
+
+# @@ TODO: link .rc file
+
+lib{zstd}: {h c}{**}
+lib{zstd}: decompress/S{*_amd64}: include = $assembler
+
+# Build options.
+#
+src_pfx = [dir_path] $src_root/libzstd/
+
+c.poptions =+ "-I$src_pfx"
+
+c.poptions += -DXXH_INLINE_ALL
+
+if $multithread
+  c.poptions += -DZSTD_MULTITHREAD
+
+switch $c.target.class, $c.target.system
+{
+  case 'windows', 'mingw32'
+    c.poptions += -D__USE_MINGW_ANSI_STDIO
+  case 'windows'
+    c.poptions += -DZSTD_HEAPMODE=0 -D_CRT_SECURE_NO_WARNINGS
+}
+
+if ($c.target.class == 'windows')
+  objs{*}: c.poptions += -DZSTD_DLL_EXPORT=1
+
+if ($multithread && $c.target.class != 'windows')
+  c.libs += -pthread
+
+# Export options.
+#
+lib{zstd}: c.export.poptions = "-I$src_pfx"
+
+if ($c.target.class == 'windows')
+  libs{zstd}: c.export.poptions += -DZSTD_DLL_IMPORT=1
+
+# Export metadata.
+#
+lib{zstd}:
+{
+  export.metadata = 1 libzstd
+
+  libzstd.multithread = [bool] $multithread
+}
+
+# For pre-releases use the complete version to make sure they cannot
+# be used in place of another pre-release or the final version. See
+# the version module for details on the version.* variable values.
+#
+if $version.pre_release
+  lib{zstd}: bin.lib.version = "-$version.project_id"
+else
+  lib{zstd}: bin.lib.version = "-$version.major.$version.minor"
+
+# Only install public headers and directly into, say, /usr/include/.
+#
+# Note that while zdict.h is not decorated with zstd, we follow Debian and
+# assume this header name is "owned" by zstd.
+#
+h{zstd}@./ h{zstd_errors}@./ h{zdict}@./: install = include/
+h{*}: install = false

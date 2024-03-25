@@ -1,0 +1,56 @@
+import! [metadata, rule_hint=c.link] lib = libzstd%lib{zstd}
+
+multithread = $($lib: libzstd.multithread)
+
+# @@ TODO: link .rc file
+
+# The zstd executable source code liberally reaches into ../lib/ to include
+# both public and private headers. We work around this by providing thunks for
+# public headers and own symlinks for a small subset of private headers (under
+# the assumption that their use won't require any unexported by libzstd
+# symbols). Actually, that assumption proved wrong for fileio_asyncio.c so
+# we now also symlink a couple of source files from lib/.
+#
+# Exclude benchmarking (plus datagen) and tracing support since they depend on
+# additional stuff from "../lib/" which likely requires unexported symbols.
+#
+exe{zstd}: c{zstdcli-build2} \
+           programs/{h c}{* -zstdcli -bench* -datagen -zstdcli_trace} \
+           lib/{h c}{**} $lib testscript
+
+exe{zstd}: programs/c{zstdcli}: include = adhoc # Included in zstdcli-build2.c.
+
+c.poptions += -DZSTD_NOBENCH -DZSTD_NOTRACE
+
+if $multithread
+  c.poptions += -DZSTD_MULTITHREAD
+
+obj{zstdcli-build2}: c.poptions += "-DZSTD_VERSION_BUILD2=\"$version\""
+
+# Hide exported ZSTD_*threadPool() functions defined in pool.c. Also suppress
+# the unused function warning that will result from doing this.
+#
+lib/common/
+{
+  obj{pool}: c.poptions += -DZSTDLIB_STATIC_API=static
+
+  if ($c.class == 'gcc')
+    obj{pool}: c.coptions += -Wno-unused-function
+}
+
+if ($multithread && $c.target.class != 'windows')
+  c.libs += -pthread
+
+# Target metadata, see also --build2-metadata in zstdcli-build2.c.
+#
+# Note that the ZSTD_NBTHREADS environment variable does not affect the
+# output.
+#
+exe{zstd}:
+{
+  export.metadata = 1 zstd
+  zstd.name = [string] zstd
+  zstd.version = [string] $version
+  zstd.checksum = [string] $version
+  zstd.environment = [strings] ZSTD_CLEVEL
+}

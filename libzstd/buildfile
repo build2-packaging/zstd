@@ -1,0 +1,8 @@
+./: {*/ -build/ -doc/} \
+    doc{README.md PACKAGE-README.md CHANGELOG} \
+    doc/doc{*.html} doc/doc{*.md -README.md} \
+    legal{LICENSE COPYING} manifest
+
+# Don't install tests.
+#
+tests/: install = false
