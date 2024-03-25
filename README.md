@@ -5,7 +5,7 @@ a fast lossless compression algorithm, targeting real-time compression
 scenarios at `zlib`-level and better compression ratios.
 
 This file contains setup instructions and other details that are more
-appropriate for the development rather than consumption. If you want to use
+appropriate for development rather than consumption. If you want to use
 `zstd` in your `build2`-based project, then instead see the accompanying
 `PACKAGE-README.md` files:
 
