@@ -1,3 +1,0 @@
-import libs = libzstd%lib{zstd}
-
-exe{driver}: c{main} $libs
