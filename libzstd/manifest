@@ -1,6 +1,6 @@
 : 1
 name: libzstd
-version: 1.5.5-a.0.z
+version: 1.5.5
 language: c
 project: zstd
 summary: Zstandard lossless compression algorithm C library
