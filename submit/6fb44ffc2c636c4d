@@ -1,0 +1,7 @@
+: 1
+name: zstd
+version: 1.5.5+1
+language: c
+project: zstd
+summary: Zstandard lossless compression algorithm command line utility
+license: BSD-3-Clause OR GPL-2.0-only
