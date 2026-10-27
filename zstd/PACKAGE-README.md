@@ -16,7 +16,7 @@ To start using `zstd` in your project, add the following build-time
 appropriate:
 
 ```
-depends: * zstd ^1.5.5
+depends: * zstd ^1.5.7
 ```
 
 Then import the executable in your `buildfile`:

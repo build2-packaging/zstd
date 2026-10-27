@@ -11,11 +11,12 @@ multithread = $($lib: libzstd.multithread)
 # symbols). Actually, that assumption proved wrong for fileio_asyncio.c so
 # we now also symlink a couple of source files from lib/.
 #
-# Exclude benchmarking (plus datagen) and tracing support since they depend on
-# additional stuff from "../lib/" which likely requires unexported symbols.
+# Exclude benchmarking (plus datagen and lorem) and tracing support since they
+# depend on additional stuff from "../lib/" which likely requires unexported
+# symbols.
 #
 exe{zstd}: c{zstdcli-build2} \
-           programs/{h c}{* -zstdcli -bench* -datagen -zstdcli_trace} \
+           programs/{h c}{* -zstdcli -bench* -datagen -lorem -zstdcli_trace} \
            lib/{h c}{**} $lib testscript
 
 exe{zstd}: programs/c{zstdcli}: include = adhoc # Included in zstdcli-build2.c.
