@@ -1,6 +1,6 @@
 : 1
 name: zstd
-version: 1.5.5+1
+version: 1.5.7-a.0.z
 language: c
 project: zstd
 summary: Zstandard lossless compression algorithm command line utility
