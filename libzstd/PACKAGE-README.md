@@ -13,7 +13,7 @@ To start using `libzstd` in your project, add the following `depends`
 value to your `manifest`, adjusting the version constraint as appropriate:
 
 ```
-depends: libzstd ^1.5.5
+depends: libzstd ^1.5.7
 ```
 
 Then import the library in your `buildfile`:
